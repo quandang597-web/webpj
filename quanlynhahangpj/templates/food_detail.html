@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ food.name }}</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #f5f5f5;
+      }
+
+      .container {
+        width: 1000px;
+        margin: auto;
+        background: white;
+        padding: 30px;
+        margin-top: 30px;
+        border-radius: 10px;
+      }
+
+      img {
+        width: 500px;
+        height: 350px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+
+      .price {
+        font-size: 30px;
+        color: red;
+        font-weight: bold;
+      }
+
+      button {
+        padding: 12px 20px;
+        background: #ff5e36;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>{{ food.name }}</h1>
+
+      <img src="{{ url_for('static', filename='food/' + food.image) }}" />
+
+      <p>{{ food.description }}</p>
+
+      <div class="price">{{ food.price }} VNĐ</div>
+
+      <hr />
+
+      <h2>🏪 Nhà hàng Quân đẹp trai</h2>
+
+      <p>
+        👨‍🍳 Đầu bếp:
+        <b>Quân đẹp trai</b>
+      </p>
+
+      <p>
+        👨‍💼 Nhân viên:
+        <b>Duy</b>
+      </p>
+
+      <p>
+        👨‍💼 Nhân viên:
+        <b>Quang Anh</b>
+      </p>
+
+      <hr />
+
+      <form action="/add-cart/{{ food.id }}" method="POST">
+        <label> Số lượng: </label>
+
+        <input type="number" name="quantity" value="1" min="1" />
+
+        <br /><br />
+
+        <button type="submit">🛒 Thêm vào giỏ hàng</button>
+      </form>
+
+      <br />
+
+      <a href="/customer/menu"> ← Quay lại menu </a>
+    </div>
+  </body>
+</html>
