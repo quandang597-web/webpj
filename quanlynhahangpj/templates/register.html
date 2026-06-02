@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký - MenuOnline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .register-card { background: white; max-width: 450px; width: 100%; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #ffaa00; }
+        h2 { color: #ff5e36; margin-bottom: 20px; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        input:focus, select:focus { border-color: #ffaa00; outline: none; }
+        .btn-submit { width: 100%; padding: 14px; background: #ffaa00; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+        .btn-submit:hover { background: #e09600; }
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 0.9rem; }
+        .back-link:hover { color: #ff5e36; }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <h2>Tạo Tài Khoản Mới</h2>
+        <form action="/register" method="POST">
+            <div class="input-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" placeholder="Ví dụ: nguyenvana" required>
+            </div>
+            <div class="input-group">
+                <label>Địa chỉ Email</label>
+                <input type="email" name="email" placeholder="Ví dụ: ana@gmail.com" required>
+            </div>
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" placeholder="Nhập mật khẩu bảo mật..." required>
+            </div>
+            <div class="input-group">
+                <label>Bạn tham gia với vai trò nào?</label>
+                <select name="role">
+                    <option value="customer">Khách Hàng (Xem menu, đặt món, tính tiền)</option>
+                    <option value="restaurant">Nhà Hàng (Đăng bài, quản lý giá, nhân viên)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">Đăng Ký Ngay</button>
+            <a href="/" class="back-link">← Quay lại trang chủ Đăng nhập</a>
+        </form>
+    </div>
+
+</body>
+</html>
