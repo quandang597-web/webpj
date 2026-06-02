@@ -255,52 +255,7 @@ def cart():
         items=items,
         total=total
     )
-# ---------------- REMOVE CART ----------------
 
-@app.route('/remove-cart/<int:index>')
-def remove_cart(index):
-
-    cart = session.get('cart', [])
-
-    if index < len(cart):
-        cart.pop(index)
-
-    session['cart'] = cart
-    session.modified = True
-
-    return redirect('/cart')
-
-
-# ---------------- CHECKOUT ----------------
-
-@app.route('/checkout')
-def checkout():
-
-    session['cart'] = []
-
-    return render_template(
-        'checkout_success.html'
-    )
-
-
-# ---------------- SEARCH FOOD ----------------
-
-@app.route('/search')
-def search():
-
-    keyword = request.args.get(
-        'keyword',
-        ''
-    )
-
-    foods = Food.query.filter(
-        Food.name.contains(keyword)
-    ).all()
-
-    return render_template(
-        'customer_menu.html',
-        foods=foods
-    )
 # ---------------- CUSTOMER DASHBOARD ----------------
 
 @app.route('/customer/dashboard')
