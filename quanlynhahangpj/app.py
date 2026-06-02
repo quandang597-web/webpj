@@ -29,7 +29,7 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
-# Trang đăng ký
+# Thay thế hàm register cũ trong app.py bằng hàm này:
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -45,49 +45,30 @@ def register():
         new_user = User(username=username, password=password, email=email, role=role)
         db.session.add(new_user)
         db.session.commit()
-        return "Đăng ký thành công! Bạn có thể quay lại trang chủ để Đăng nhập."
+        
+        # --- TỰ ĐỘNG ĐĂNG NHẬP NGAY SAU KHI ĐĂNG KÝ THÀNH CÔNG ---
+        session['user_id'] = new_user.id
+        session['username'] = new_user.username
+        session['role'] = new_user.role
+        
+        # Điều hướng thẳng vào Dashboard tương ứng luôn
+        if new_user.role == 'customer':
+            return redirect(url_for('customer_dashboard'))
+        elif new_user.role == 'restaurant':
+            return redirect(url_for('restaurant_dashboard'))
         
     return render_template('register.html')
 
-# Xử lý đăng nhập
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-    
-    user = User.query.filter_by(username=username, password=password).first()
-    
-    if user:
-        session['user_id'] = user.id
-        session['username'] = user.username
-        session['role'] = user.role
-        
-        if user.role == 'customer':
-            return redirect(url_for('customer_dashboard'))
-        elif user.role == 'restaurant':
-            return redirect(url_for('restaurant_dashboard'))
-    else:
-        return "Sai tài khoản hoặc mật khẩu rồi!"
 
-# Giao diện Khách hàng
+# Đồng thời chỉnh sửa lại 2 hàm hiển thị trang Dashboard để nó gọi file HTML thay vì chuỗi chữ thô:
 @app.route('/customer/dashboard')
 def customer_dashboard():
     if 'role' not in session or session['role'] != 'customer':
         return redirect(url_for('index'))
-    return f"<h1>Chào {session['username']} (Khách hàng)!</h1><p></p><a href='/logout'>Đăng xuất</a>"
+    return render_template('customerux.html') # Gọi file giao diện khách
 
-# Giao diện Nhà hàng
 @app.route('/restaurant/dashboard')
 def restaurant_dashboard():
     if 'role' not in session or session['role'] != 'restaurant':
         return redirect(url_for('index'))
-    return f"<h1>Chào {session['username']} (Nhà hàng)!</h1><p></p><a href='/logout'>Đăng xuất</a>"
-
-# Đăng xuất
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return render_template('restaurantux.html') # Gọi file giao diện nhà hàng
