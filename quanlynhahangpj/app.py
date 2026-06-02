@@ -3,14 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# ---------------- CONFIG ----------------
+# --- CẤU HÌNH ỨNG DỤNG ---
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanlynhahang.db'
 app.config['SECRET_KEY'] = 'sieu_bao_mat_2026'
-
+# --- KHỞI TẠO DATABASE ---
 db = SQLAlchemy(app)
 
-# ---------------- USER ----------------
+# --- MODEL USER ---
 
 class User(db.Model):
 
@@ -38,7 +38,7 @@ class User(db.Model):
         nullable=False
     )
 
-# ---------------- FOOD ----------------
+# model food
 
 class Food(db.Model):
 
@@ -63,8 +63,32 @@ class Food(db.Model):
     image = db.Column(
         db.String(255)
     )
+# review
 
-# ---------------- CREATE DATABASE ----------------
+class Review(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    food_id = db.Column(
+        db.Integer,
+        db.ForeignKey('food.id')
+    )
+
+    username = db.Column(
+        db.String(100)
+    )
+
+    star = db.Column(
+        db.Integer
+    )
+
+    comment = db.Column(
+        db.Text
+    )
+# Tạo bảng tự động trong context
 
 with app.app_context():
 
@@ -99,13 +123,13 @@ with app.app_context():
         db.session.add_all(foods)
         db.session.commit()
 
-# ---------------- HOME ----------------
-
+# --- CÁC ROUTE ĐIỀU HƯỚNG ---
+# Trang chủ giới thiệu
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# ---------------- REGISTER ----------------
+# Trang đăng ký
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -138,7 +162,7 @@ def register():
 
     return render_template('register.html')
 
-# ---------------- LOGIN ----------------
+# Xử lý đăng nhập
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -163,7 +187,7 @@ def login():
 
     return redirect('/restaurant/dashboard')
 
-# ---------------- CUSTOMER MENU ----------------
+# menu cho khách hàng
 
 @app.route('/customer/menu')
 def customer_menu():
@@ -174,8 +198,25 @@ def customer_menu():
         'customer_menu.html',
         foods=foods
     )
+# tìm kiếm đồ ăn
 
-# ---------------- FOOD DETAIL ----------------
+@app.route('/search')
+def search():
+
+    keyword = request.args.get(
+        'keyword',
+        ''
+    )
+
+    foods = Food.query.filter(
+        Food.name.contains(keyword)
+    ).all()
+
+    return render_template(
+        'customer_menu.html',
+        foods=foods
+    )
+# giới thiệu chi tiết food
 
 @app.route('/food/<int:id>')
 def food_detail(id):
@@ -187,7 +228,7 @@ def food_detail(id):
         food=food
     )
 
-# ---------------- ADD CART ----------------
+# thêm vào giỏ hàng
 
 @app.route('/add-cart/<int:id>', methods=['POST'])
 def add_cart(id):
@@ -211,7 +252,7 @@ def add_cart(id):
 
     return redirect('/cart')
 
-# ---------------- CART ----------------
+# -giỏ hàng
 
 @app.route('/cart')
 def cart():
@@ -256,7 +297,7 @@ def cart():
         total=total
     )
 
-# ---------------- CUSTOMER DASHBOARD ----------------
+# giao diện khách hàng
 
 @app.route('/customer/dashboard')
 def customer_dashboard():
@@ -269,7 +310,7 @@ def customer_dashboard():
 
     return redirect('/customer/menu')
 
-# ---------------- RESTAURANT DASHBOARD ----------------
+# giao diện nhà hàng
 
 @app.route('/restaurant/dashboard')
 def restaurant_dashboard():
@@ -288,7 +329,7 @@ def restaurant_dashboard():
     </a>
     """
 
-# ---------------- LOGOUT ----------------
+# đăng xuất
 
 @app.route('/logout')
 def logout():
@@ -296,8 +337,6 @@ def logout():
     session.clear()
 
     return redirect('/')
-
-# ---------------- RUN ----------------
 
 if __name__ == '__main__':
     app.run(debug=True)
