@@ -255,6 +255,31 @@
                           value="{{ item.price }}"
                           class="form-control mb-2"
                         />
+                        <select name="chef_id" class="form-control mb-2">
+                          <option value="">Chọn đầu bếp</option>
+
+                          {% for s in staff %}
+<option
+  value="{{ s.id }}"
+  {% if item.chef_id == s.id %}selected{% endif %}
+>
+  {{ s.name }} - {{ s.role }}
+</option>
+{% endfor %}
+
+                        <label>Nhân viên</label>
+
+                        <select
+                          name="staff_ids"
+                          multiple
+                          class="form-control mb-2"
+                        >
+                          {% for s in staff %}
+                          <option value="{{ s.id }}">
+                            {{ s.name }} - {{ s.role }}
+                          </option>
+                          {% endfor %}
+                        </select>
 
                         <input type="file" name="image" class="form-control" />
                       </div>
@@ -309,6 +334,12 @@
                 <h5>{{ cert.title }}</h5>
 
                 <p>{{ cert.issuer }}</p>
+                <form
+                  action="/restaurant/certificate/delete/{{ cert.id }}"
+                  method="POST"
+                >
+                  <button class="btn btn-danger btn-sm">Xóa chứng chỉ</button>
+                </form>
               </div>
               {% endfor %}
             </div>
@@ -387,6 +418,22 @@
                 placeholder="Giá tiền"
                 required
               />
+
+              <select name="chef_id" class="form-control mb-2">
+                <option value="">Chọn đầu bếp</option>
+
+                {% for s in staff %} {% if "bếp" in s.role.lower() %}
+                <option value="{{ s.id }}">{{ s.name }} - {{ s.role }}</option>
+                {% endif %} {% endfor %}
+              </select>
+
+              <label>Nhân viên phục vụ</label>
+
+              <select name="staff_ids" multiple class="form-control mb-2">
+                {% for s in staff %}
+                <option value="{{ s.id }}">{{ s.name }} - {{ s.role }}</option>
+                {% endfor %}
+              </select>
 
               <input type="file" name="image" class="form-control" />
             </div>

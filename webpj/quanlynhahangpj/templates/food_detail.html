@@ -62,11 +62,24 @@
 
       <h2>👨‍🍳 Giới thiệu nhà hàng</h2>
 
-      <p>Chủ nhà hàng: Quân đẹp trai</p>
+      {% if chef %}
+      <p>
+        <b>Đầu bếp chính:</b>
+        {{ chef.name }} ({{ chef.role }})
+      </p>
 
-      <p>Đầu bếp chính: Quân đẹp trai</p>
+      <p>{{ chef.bio }}</p>
+      {% endif %}
 
-      <p>Nhân viên: Duy, Quang Anh</p>
+      <p>
+        <b>Nhân viên tham gia:</b>
+      </p>
+
+      <ul>
+        {% for s in staff_members %}
+        <li>{{ s.name }} - {{ s.role }}</li>
+        {% endfor %}
+      </ul>
 
       <hr />
 

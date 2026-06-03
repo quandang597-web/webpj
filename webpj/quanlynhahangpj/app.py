@@ -52,6 +52,9 @@ class Food(db.Model):
     price = db.Column(db.Integer)
     image = db.Column(db.String(255))
 
+    chef_id = db.Column(db.Integer, db.ForeignKey('staff.id'))
+    staff_ids = db.Column(db.String(255))
+
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'))
@@ -63,14 +66,34 @@ class Review(db.Model):
 # --- KHỞI TẠO DỮ LIỆU MẪU ---
 with app.app_context():
     db.create_all()
-    # tự thêm cột reply nếu database cũ chưa có
+
+    # reply
     try:
-        db.session.execute(db.text(
-            "ALTER TABLE review ADD COLUMN reply TEXT"
-        ))
+        db.session.execute(
+            db.text("ALTER TABLE review ADD COLUMN reply TEXT")
+        )
         db.session.commit()
     except:
         db.session.rollback()
+
+    # chef_id
+    try:
+        db.session.execute(
+            db.text("ALTER TABLE food ADD COLUMN chef_id INTEGER")
+        )
+        db.session.commit()
+    except:
+        db.session.rollback()
+
+    # staff_ids
+    try:
+        db.session.execute(
+            db.text("ALTER TABLE food ADD COLUMN staff_ids TEXT")
+        )
+        db.session.commit()
+    except:
+        db.session.rollback()
+
     if Food.query.count() == 0:
         foods = [
             Food(name="Phở Bò", description="Phở bò tái nạm đặc biệt", price=50000, image="pho.jpg"),
@@ -148,10 +171,30 @@ def food_detail(id):
         food_id=id
     ).all()
 
+    chef = None
+
+    if food.chef_id:
+        chef = Staff.query.get(food.chef_id)
+
+    staff_members = []
+
+    if food.staff_ids:
+        ids = [
+            int(x)
+            for x in food.staff_ids.split(',')
+            if x
+        ]
+
+        staff_members = Staff.query.filter(
+            Staff.id.in_(ids)
+        ).all()
+
     return render_template(
         'food_detail.html',
         food=food,
-        reviews=reviews
+        reviews=reviews,
+        chef=chef,
+        staff_members=staff_members
     )
 
 @app.route('/add-cart/<int:id>', methods=['POST'])
@@ -216,6 +259,13 @@ def add_food():
     name = request.form.get('name')
     description = request.form.get('description')
     price = int(request.form.get('price', 0))
+
+    chef_id = request.form.get('chef_id')
+
+    staff_ids = ",".join(
+        request.form.getlist('staff_ids')
+    )
+
     file = request.files.get('image')
 
     image_name = 'pho.jpg'
@@ -225,7 +275,14 @@ def add_food():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         image_name = filename
 
-    new_food = Food(name=name, description=description, price=price, image=image_name)
+    new_food = Food(
+    name=name,
+    description=description,
+    price=price,
+    image=image_name,
+    chef_id=chef_id if chef_id else None,
+    staff_ids=staff_ids
+)
     db.session.add(new_food)
     db.session.commit()
     return redirect(url_for('restaurant_dashboard'))
@@ -239,6 +296,8 @@ def edit_food(food_id):
     food.name = request.form.get('name')
     food.description = request.form.get('description')
     food.price = int(request.form.get('price', 0))
+    food.chef_id = request.form.get('chef_id')
+    food.staff_ids = ",".join(request.form.getlist('staff_ids'))
 
     file = request.files.get('image')
     if file and allowed_file(file.filename):
@@ -331,7 +390,18 @@ def reply_review(review_id):
     review.reply = reply_content
     db.session.commit()
     return redirect(url_for('restaurant_dashboard'))
+@app.route('/restaurant/certificate/delete/<int:cert_id>', methods=['POST'])
+def delete_certificate(cert_id):
 
+    if 'role' not in session or session['role'] != 'restaurant':
+        return redirect(url_for('index'))
+
+    cert = Certificate.query.get_or_404(cert_id)
+
+    db.session.delete(cert)
+    db.session.commit()
+
+    return redirect(url_for('restaurant_dashboard'))
 @app.route('/logout')
 def logout():
     session.clear()
