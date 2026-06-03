@@ -60,6 +60,14 @@ class Review(db.Model):
 # --- KHỞI TẠO DỮ LIỆU MẪU ---
 with app.app_context():
     db.create_all()
+    # tự thêm cột reply nếu database cũ chưa có
+    try:
+        db.session.execute(db.text(
+            "ALTER TABLE review ADD COLUMN reply TEXT"
+        ))
+        db.session.commit()
+    except:
+        db.session.rollback()
     if Food.query.count() == 0:
         foods = [
             Food(name="Phở Bò", description="Phở bò tái nạm đặc biệt", price=50000, image="pho.jpg"),

@@ -1,342 +1,342 @@
-from flask import Flask, request, redirect, render_template, session, url_for
-from flask_sqlalchemy import SQLAlchemy
+    from flask import Flask, request, redirect, render_template, session, url_for
+    from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
+    app = Flask(__name__)
 
-# --- CẤU HÌNH ỨNG DỤNG ---
+    # --- CẤU HÌNH ỨNG DỤNG ---
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanlynhahang.db'
-app.config['SECRET_KEY'] = 'sieu_bao_mat_2026'
-# --- KHỞI TẠO DATABASE ---
-db = SQLAlchemy(app)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanlynhahang.db'
+    app.config['SECRET_KEY'] = 'sieu_bao_mat_2026'
+    # --- KHỞI TẠO DATABASE ---
+    db = SQLAlchemy(app)
 
-# --- MODEL USER ---
+    # --- MODEL USER ---
 
-class User(db.Model):
+    class User(db.Model):
 
-    id = db.Column(db.Integer, primary_key=True)
+        id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(
-        db.String(50),
-        unique=True,
-        nullable=False
-    )
+        username = db.Column(
+            db.String(50),
+            unique=True,
+            nullable=False
+        )
 
-    password = db.Column(
-        db.String(100),
-        nullable=False
-    )
+        password = db.Column(
+            db.String(100),
+            nullable=False
+        )
 
-    email = db.Column(
-        db.String(100),
-        unique=True,
-        nullable=False
-    )
+        email = db.Column(
+            db.String(100),
+            unique=True,
+            nullable=False
+        )
 
-    role = db.Column(
-        db.String(20),
-        nullable=False
-    )
+        role = db.Column(
+            db.String(20),
+            nullable=False
+        )
 
-# model food
+    # model food
 
-class Food(db.Model):
+    class Food(db.Model):
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+        id = db.Column(
+            db.Integer,
+            primary_key=True
+        )
 
-    name = db.Column(
-        db.String(100),
-        nullable=False
-    )
+        name = db.Column(
+            db.String(100),
+            nullable=False
+        )
 
-    description = db.Column(
-        db.Text
-    )
+        description = db.Column(
+            db.Text
+        )
 
-    price = db.Column(
-        db.Integer
-    )
+        price = db.Column(
+            db.Integer
+        )
 
-    image = db.Column(
-        db.String(255)
-    )
-# review
+        image = db.Column(
+            db.String(255)
+        )
+    # review
 
-class Review(db.Model):
+    class Review(db.Model):
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+        id = db.Column(
+            db.Integer,
+            primary_key=True
+        )
 
-    food_id = db.Column(
-        db.Integer,
-        db.ForeignKey('food.id')
-    )
+        food_id = db.Column(
+            db.Integer,
+            db.ForeignKey('food.id')
+        )
 
-    username = db.Column(
-        db.String(100)
-    )
+        username = db.Column(
+            db.String(100)
+        )
 
-    star = db.Column(
-        db.Integer
-    )
+        star = db.Column(
+            db.Integer
+        )
 
-    comment = db.Column(
-        db.Text
-    )
-# Tạo bảng tự động trong context
+        comment = db.Column(
+            db.Text
+        )
+    # Tạo bảng tự động trong context
 
-with app.app_context():
+    with app.app_context():
 
-    db.create_all()
+        db.create_all()
 
-    if Food.query.count() == 0:
+        if Food.query.count() == 0:
 
-        foods = [
+            foods = [
 
-            Food(
-                name="Phở Bò",
-                description="Phở bò tái nạm đặc biệt",
-                price=50000,
-                image="pho.jpg"
-            ),
+                Food(
+                    name="Phở Bò",
+                    description="Phở bò tái nạm đặc biệt",
+                    price=50000,
+                    image="pho.jpg"
+                ),
 
-            Food(
-                name="Cơm Tấm",
-                description="Cơm tấm sườn bì chả",
-                price=45000,
-                image="comtam.jpg"
-            ),
+                Food(
+                    name="Cơm Tấm",
+                    description="Cơm tấm sườn bì chả",
+                    price=45000,
+                    image="comtam.jpg"
+                ),
 
-            Food(
-                name="Bún Chả",
-                description="Bún chả Hà Nội",
-                price=40000,
-                image="buncha.jpg"
+                Food(
+                    name="Bún Chả",
+                    description="Bún chả Hà Nội",
+                    price=40000,
+                    image="buncha.jpg"
+                )
+            ]
+
+            db.session.add_all(foods)
+            db.session.commit()
+
+    # --- CÁC ROUTE ĐIỀU HƯỚNG ---
+    # Trang chủ giới thiệu
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    # Trang đăng ký
+
+    @app.route('/register', methods=['GET', 'POST'])
+    def register():
+
+        if request.method == 'POST':
+
+            username = request.form['username']
+            password = request.form['password']
+            email = request.form['email']
+            role = request.form['role']
+
+            user_exists = User.query.filter_by(
+                username=username
+            ).first()
+
+            if user_exists:
+                return "Tài khoản đã tồn tại!"
+
+            new_user = User(
+                username=username,
+                password=password,
+                email=email,
+                role=role
             )
-        ]
 
-        db.session.add_all(foods)
-        db.session.commit()
+            db.session.add(new_user)
+            db.session.commit()
 
-# --- CÁC ROUTE ĐIỀU HƯỚNG ---
-# Trang chủ giới thiệu
-@app.route('/')
-def index():
-    return render_template('index.html')
+            return "Đăng ký thành công"
 
-# Trang đăng ký
+        return render_template('register.html')
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
+    # Xử lý đăng nhập
 
-    if request.method == 'POST':
+    @app.route('/login', methods=['POST'])
+    def login():
 
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        role = request.form['role']
+        print("FORM =", request.form)
 
-        user_exists = User.query.filter_by(
-            username=username
-        ).first()
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-        if user_exists:
-            return "Tài khoản đã tồn tại!"
+        return f"""
+        username = {username}<br>
+        password = {password}
+        """
 
-        new_user = User(
-            username=username,
-            password=password,
-            email=email,
-            role=role
+        if not user:
+            return "Sai tài khoản hoặc mật khẩu"
+
+        session['user_id'] = user.id
+        session['username'] = user.username
+        session['role'] = user.role
+
+        if user.role == "customer":
+            return redirect('/customer/menu')
+
+        return redirect('/restaurant/dashboard')
+
+    # menu cho khách hàng
+
+    @app.route('/customer/menu')
+    def customer_menu():
+
+        foods = Food.query.all()
+
+        return render_template(
+            'customer_menu.html',
+            foods=foods
+        )
+    # tìm kiếm đồ ăn
+
+    @app.route('/search')
+    def search():
+
+        keyword = request.args.get(
+            'keyword',
+            ''
         )
 
-        db.session.add(new_user)
-        db.session.commit()
+        foods = Food.query.filter(
+            Food.name.contains(keyword)
+        ).all()
 
-        return "Đăng ký thành công"
+        return render_template(
+            'customer_menu.html',
+            foods=foods
+        )
+    # giới thiệu chi tiết food
 
-    return render_template('register.html')
+    @app.route('/food/<int:id>')
+    def food_detail(id):
 
-# Xử lý đăng nhập
+        food = Food.query.get_or_404(id)
 
-@app.route('/login', methods=['POST'])
-def login():
-
-    username = request.form['username']
-    password = request.form['password']
-
-    user = User.query.filter_by(
-        username=username,
-        password=password
-    ).first()
-
-    if not user:
-        return "Sai tài khoản hoặc mật khẩu"
-
-    session['user_id'] = user.id
-    session['username'] = user.username
-    session['role'] = user.role
-
-    if user.role == "customer":
-        return redirect('/customer/menu')
-
-    return redirect('/restaurant/dashboard')
-
-# menu cho khách hàng
-
-@app.route('/customer/menu')
-def customer_menu():
-
-    foods = Food.query.all()
-
-    return render_template(
-        'customer_menu.html',
-        foods=foods
-    )
-# tìm kiếm đồ ăn
-
-@app.route('/search')
-def search():
-
-    keyword = request.args.get(
-        'keyword',
-        ''
-    )
-
-    foods = Food.query.filter(
-        Food.name.contains(keyword)
-    ).all()
-
-    return render_template(
-        'customer_menu.html',
-        foods=foods
-    )
-# giới thiệu chi tiết food
-
-@app.route('/food/<int:id>')
-def food_detail(id):
-
-    food = Food.query.get_or_404(id)
-
-    return render_template(
-        'food_detail.html',
-        food=food
-    )
-
-# thêm vào giỏ hàng
-
-@app.route('/add-cart/<int:id>', methods=['POST'])
-def add_cart(id):
-
-    quantity = int(
-        request.form['quantity']
-    )
-
-    if 'cart' not in session:
-        session['cart'] = []
-
-    session['cart'].append({
-
-        'food_id': id,
-
-        'quantity': quantity
-
-    })
-
-    session.modified = True
-
-    return redirect('/cart')
-
-# -giỏ hàng
-
-@app.route('/cart')
-def cart():
-
-    cart_data = session.get(
-        'cart',
-        []
-    )
-
-    items = []
-
-    total = 0
-
-    for item in cart_data:
-
-        food = Food.query.get(
-            item['food_id']
+        return render_template(
+            'food_detail.html',
+            food=food
         )
 
-        subtotal = (
-            food.price *
-            item['quantity']
+    # thêm vào giỏ hàng
+
+    @app.route('/add-cart/<int:id>', methods=['POST'])
+    def add_cart(id):
+
+        quantity = int(
+            request.form['quantity']
         )
 
-        total += subtotal
+        if 'cart' not in session:
+            session['cart'] = []
 
-        items.append({
+        session['cart'].append({
 
-            'food': food,
+            'food_id': id,
 
-            'quantity':
-            item['quantity'],
-
-            'subtotal':
-            subtotal
+            'quantity': quantity
 
         })
 
-    return render_template(
-        'cart.html',
-        items=items,
-        total=total
-    )
+        session.modified = True
 
-# giao diện khách hàng
+        return redirect('/cart')
 
-@app.route('/customer/dashboard')
-def customer_dashboard():
+    # -giỏ hàng
 
-    if (
-        'role' not in session or
-        session['role'] != 'customer'
-    ):
+    @app.route('/cart')
+    def cart():
+
+        cart_data = session.get(
+            'cart',
+            []
+        )
+
+        items = []
+
+        total = 0
+
+        for item in cart_data:
+
+            food = Food.query.get(
+                item['food_id']
+            )
+
+            subtotal = (
+                food.price *
+                item['quantity']
+            )
+
+            total += subtotal
+
+            items.append({
+
+                'food': food,
+
+                'quantity':
+                item['quantity'],
+
+                'subtotal':
+                subtotal
+
+            })
+
+        return render_template(
+            'cart.html',
+            items=items,
+            total=total
+        )
+
+    # giao diện khách hàng
+
+    @app.route('/customer/dashboard')
+    def customer_dashboard():
+
+        if (
+            'role' not in session or
+            session['role'] != 'customer'
+        ):
+            return redirect('/')
+
+        return render_template(
+            'customerux.html'
+        )
+
+    # giao diện nhà hàng
+
+    @app.route('/restaurant/dashboard')
+    def restaurant_dashboard():
+
+        if (
+            'role' not in session or
+            session['role'] != 'restaurant'
+        ):
+            return redirect('/')
+
+        return render_template(
+            'restaurantux.html'
+        )
+
+    # đăng xuất
+
+    @app.route('/logout')
+    def logout():
+
+        session.clear()
+
         return redirect('/')
 
-    return redirect('/customer/menu')
-
-# giao diện nhà hàng
-
-@app.route('/restaurant/dashboard')
-def restaurant_dashboard():
-
-    if (
-        'role' not in session or
-        session['role'] != 'restaurant'
-    ):
-        return redirect('/')
-
-    return f"""
-    <h1>Chào {session['username']} (Nhà hàng)</h1>
-
-    <a href='/logout'>
-        Đăng xuất
-    </a>
-    """
-
-# đăng xuất
-
-@app.route('/logout')
-def logout():
-
-    session.clear()
-
-    return redirect('/')
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    if __name__ == '__main__':
+        app.run(debug=True)
