@@ -7,6 +7,9 @@ app = Flask(__name__)
 
 # --- CẤU HÌNH ỨNG DỤNG ---
 UPLOAD_FOLDER = os.path.join('static', 'food')
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -140,7 +143,16 @@ def search():
 @app.route('/food/<int:id>')
 def food_detail(id):
     food = Food.query.get_or_404(id)
-    return render_template('food_detail.html', food=food)
+
+    reviews = Review.query.filter_by(
+        food_id=id
+    ).all()
+
+    return render_template(
+        'food_detail.html',
+        food=food,
+        reviews=reviews
+    )
 
 @app.route('/add-cart/<int:id>', methods=['POST'])
 def add_cart(id):
