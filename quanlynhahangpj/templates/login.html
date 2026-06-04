@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - MenuOnline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #ff5e36 0%, #ffaa00 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-card { background: white; max-width: 450px; width: 100%; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-top: 5px solid #ff5e36; }
+        h2 { color: #ff5e36; margin-bottom: 25px; text-align: center; font-size: 1.8rem; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        input:focus { border-color: #ff5e36; outline: none; }
+        .btn-submit { width: 100%; padding: 14px; background: #ff5e36; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+        .btn-submit:hover { background: #e04f2a; }
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 0.9rem; }
+        .back-link:hover { color: #ff5e36; }
+        .register-link { display: block; text-align: center; margin-top: 10px; color: #ffaa00; text-decoration: none; font-size: 0.95rem; font-weight: 600; }
+        .register-link:hover { color: #e09600; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>Đăng Nhập</h2>
+        <form action="/login" method="POST">
+            <div class="input-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" placeholder="Nhập tài khoản..." required>
+            </div>
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" placeholder="Nhập mật khẩu..." required>
+            </div>
+            <button type="submit" class="btn-submit">Đăng Nhập</button>
+        </form>
+        <a href="/register" class="register-link">Chưa có tài khoản? Đăng ký ngay →</a>
+        <a href="/" class="back-link">← Quay lại trang chủ</a>
+    </div>
+
+</body>
+</html>
