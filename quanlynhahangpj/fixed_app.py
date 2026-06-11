@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session, url_for
+from flask import Flask, request, redirect, render_template, session, url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.utils import secure_filename
@@ -126,7 +126,8 @@ def register():
 
         user_exists = User.query.filter_by(username=username).first()
         if user_exists:
-            return "Tài khoản đã tồn tại!"
+            flash("Tài khoản này đã tồn tại! Vui lòng chọn tên đăng nhập khác.", "danger")
+            return redirect(url_for('register'))
 
         new_user = User(username=username, password=password, email=email, role=role)
         db.session.add(new_user)
@@ -144,7 +145,8 @@ def login():
 
         user = User.query.filter_by(username=username, password=password).first()
         if not user:
-            return "Sai tài khoản hoặc mật khẩu"
+            flash("Sai tài khoản hoặc mật khẩu. Vui lòng kiểm tra lại!", "danger")
+            return redirect(url_for('login'))
 
         session['user_id'] = user.id
         session['username'] = user.username
