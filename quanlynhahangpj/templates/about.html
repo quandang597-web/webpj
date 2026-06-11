@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Giới Thiệu Nhà Hàng & Chứng Nhận</title>
+    <style>
+      body {
+        background: #f5f5f5;
+        font-family: Arial, sans-serif;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        width: 1000px;
+        margin: 30px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.05);
+      }
+
+      h1 {
+        color: #ff5e36;
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        margin-bottom: 40px;
+      }
+
+      h2 {
+        border-left: 5px solid #ff5e36;
+        padding-left: 10px;
+        color: #222;
+        margin-top: 40px;
+      }
+
+      /* CSS cho phần Chứng chỉ */
+      .cert-grid {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .cert-card {
+        border: 1px solid #e0e0e0;
+        padding: 15px;
+        border-radius: 8px;
+        width: 210px;
+        text-align: center;
+        background: #fff;
+        transition: transform 0.2s;
+      }
+
+      .cert-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+
+      .cert-img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 6px;
+      }
+
+      /* CSS cho phần Nhân sự */
+      .staff-grid {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .staff-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: #fcfcfc;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        width: 45%;
+      }
+
+      .avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #ff5e36;
+      }
+
+      .back-btn {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #ff5e36;
+        text-decoration: none;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="/customer/menu" class="back-btn">← Quay lại Thực đơn</a>
+
+      <h1>VỀ CHÚNG TÔI</h1>
+      <p class="subtitle">Hành trình xây dựng uy tín và đội ngũ tận tâm của nhà hàng</p>
+
+      <h2>🏆 Chứng Chỉ & Thành Tích Đạt Được</h2>
+      <div class="cert-grid">
+        {% for cert in certs %}
+          <div class="cert-card">
+            <img class="cert-img" src="{{ url_for('static', filename='food/' + cert.image) }}" alt="{{ cert.title }}">
+            <h4 style="margin: 12px 0 5px 0; font-size: 16px;">{{ cert.title }}</h4>
+            <p style="margin: 0; font-size: 13px; color: #777;">Nơi cấp: {{ cert.issuer }}</p>
+          </div>
+        {% endfor %}
+        
+        {% if not certs %}
+          <p style="color: #999; font-style: italic;">Nhà hàng đang cập nhật các chứng chỉ...</p>
+        {% endif %}
+      </div>
+
+      <h2>👨‍🍳 Đội Ngũ Nhân Sự Tận Tâm</h2>
+      <div class="staff-grid">
+        {% for s in staff %}
+          <div class="staff-card">
+            <img class="avatar" src="{{ url_for('static', filename='food/' + s.image) }}" alt="{{ s.name }}">
+            <div>
+              <b style="font-size: 18px; color: #111;">{{ s.name }}</b>
+              <p style="margin: 4px 0; color: #ff5e36; font-weight: bold; font-size: 14px;">Chức vụ: {{ s.role }}</p>
+              <p style="margin: 5px 0 0 0; font-size: 13px; color: #666; line-height: 1.4;">{{ s.bio }}</p>
+            </div>
+          </div>
+        {% endfor %}
+
+        {% if not staff %}
+          <p style="color: #999; font-style: italic;">Nhà hàng đang cập nhật danh sách nhân sự...</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </body>
+</html>

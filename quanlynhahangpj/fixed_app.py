@@ -104,7 +104,14 @@ with app.app_context():
         db.session.commit()
 
 # --- CÁC ROUTE ĐIỀU HƯỚNG ---
-
+@app.route('/about')
+def about_us():
+    # Lấy toàn bộ danh sách nhân viên và chứng chỉ từ cơ sở dữ liệu
+    all_staff = Staff.query.all()
+    all_certs = Certificate.query.all()
+    
+    # Trả về một giao diện riêng biệt tên là about.html
+    return render_template('about.html', staff=all_staff, certs=all_certs)
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -188,13 +195,12 @@ def food_detail(id):
         staff_members = Staff.query.filter(
             Staff.id.in_(ids)
         ).all()
-
     return render_template(
         'food_detail.html',
         food=food,
         reviews=reviews,
         chef=chef,
-        staff_members=staff_members
+        staff_members=staff_members,
     )
 
 @app.route('/add-cart/<int:id>', methods=['POST'])
@@ -338,9 +344,7 @@ def edit_food(food_id):
 
         food.image = filename
 
-    db.session.commit()
 
-    return redirect(url_for('restaurant_dashboard'))
     file = request.files.get('image')
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
